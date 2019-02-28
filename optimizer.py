@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
-
-with open("in/a_example.txt", "r") as ins:
+from run import Slide
+from run import out_str
+from run import score
+with open("in/b_lovely_landscapes.txt", "r") as ins:
     all_slides_list = []
     i = 0
     for line in ins:
@@ -16,7 +18,7 @@ with open("in/a_example.txt", "r") as ins:
 
 df = pd.DataFrame(all_slides_list)
 df.columns = ['ID', 'H_or_V', 'num_tags', 'tags']
-
+print("foobar")
 df.head()
 
 df.describe()
@@ -60,4 +62,35 @@ def create_slidedeck(df_H, df_V):
 
 
 slidedeck = create_slidedeck(df_H, df_V)
-print(slidedeck)
+
+slideEntry = slidedeck[0]
+slideshow = []
+
+
+def getSlideFromDf(slideEntry):
+    return Slide(map(lambda x: str(x), slideEntry[0]), slideEntry[1], set(slideEntry[3]))
+slideshow.append(getSlideFromDf(slideEntry))
+    
+
+
+index = 0
+
+neededLength = len(slidedeck)
+while(len(slideshow) < neededLength):
+    tempScore = 0
+    highestIndex = 0
+    tempIndex = 0
+    for df in slidedeck:
+        newScore = score(slideshow[index], getSlideFromDf(df))
+        if(newScore > tempScore):
+            tempScore = newScore
+            highestIndex = tempIndex
+        tempIndex = tempIndex + 1
+    slideshow.append(getSlideFromDf(slidedeck[highestIndex]))
+    slidedeck.pop(highestIndex)
+    
+    index = index + 1
+
+out_str(slideshow)
+
+
